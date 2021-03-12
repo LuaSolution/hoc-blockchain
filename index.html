@@ -1,0 +1,52 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/sha256.min.js"></script>
+<script src="./block.js"></script>
+<script src="./blockchain.js"></script>
+
+<h2>Danh sách các giao dịch hiện tại trong Blockchain:</h2>
+<pre id="DanhSachGiaoDich"></pre>
+<br />
+<h2>Kiểm tra tính toàn vẹn của Blockchain trước khi chỉnh sửa:</h2>
+<p id="TruocKhiSua"></p>
+<br />
+<h2>Danh sách các giao dịch đã bị sửa trong Blockchain:</h2>
+<pre id="DanhSachGiaoDichDaSua"></pre>
+<br />
+<h2>Kiểm tra tính toàn vẹn của Blockchain sau khi đã bị sửa:</h2>
+<p id="SauKhiSua"></p>
+<br />
+
+<script>
+  /*=== BẮT ĐẦU TEST CÁC CHỨC NĂNG CỦA BLOCKCHAIN VỪA TẠO  ===*/
+
+  var MyCoin = new Blockchain(); //Tạo mới một Blockchain để chứa các giao dịch.
+  MyCoin.createBlock(new Block("02/01/2018", { //Thêm một giao dịch mới, Data là một Object chứa nội dung chuyển tiền
+    NguoiGui: "Ong A",
+    NguoiNhan: "Ba B",
+    Tien: 350
+  }));
+
+  MyCoin.createBlock(new Block("03/01/2018", { //Thêm một giao dịch mới, Data là một Object chứa nội dung chuyển tiền
+    NguoiGui: "Ba B",
+    NguoiNhan: "Ong C",
+    Tien: 200
+  }));
+
+  //Đầu tiên ta hiển thị thử xem mảng Blockchain chứa giao dịch đang có những gì
+  document.getElementById("DanhSachGiaoDich").innerHTML = JSON.stringify(MyCoin, null, 2);
+
+  //Ta kiểm tra tính toàn vẹn của Mảng Blockchain hiện tại.
+  document.getElementById("TruocKhiSua").innerHTML = MyCoin.validating(); //return  true;
+
+  //Giả sử Hacker lấy được toàn bộ mảng Blockchain hiện tại của ta, và hắn tìm cách sửa đổi một phần tử trong mảng.
+  MyCoin.blockArr[2].data = {
+    NguoiGui: "Ba B",
+    NguoiNhan: "Ong C",
+    Tien: 400
+  };
+
+  //Lúc này mảng đã bị ảnh hưởng, hãy kiểm tra tính toàn vẹn của mảng một lần nữa.
+  document.getElementById("DanhSachGiaoDichDaSua").innerHTML = JSON.stringify(MyCoin, null, 2);
+  document.getElementById("SauKhiSua").innerHTML = MyCoin.validating(); //return false;
+
+</script>
