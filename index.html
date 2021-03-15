@@ -2,51 +2,91 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/sha256.min.js"></script>
 <script src="./block.js"></script>
 <script src="./blockchain.js"></script>
+<script src="./exchange.js"></script>
 
-<h2>Danh sách các giao dịch hiện tại trong Blockchain:</h2>
-<pre id="DanhSachGiaoDich"></pre>
+<h2>Danh sách các giao dịch sau khi đào tiền ảo lần 1 trong Blockchain:</h2>
+<pre id="DanhSachExchangeSauKhiDaoLan1"></pre>
 <br />
-<h2>Kiểm tra tính toàn vẹn của Blockchain trước khi chỉnh sửa:</h2>
-<p id="TruocKhiSua"></p>
+<h2>Kiểm tra lần đào 1 myWallet :
+  <pre id="DiaChiViTienCuaToiLan1"></pre>
+</h2>
 <br />
-<h2>Danh sách các giao dịch đã bị sửa trong Blockchain:</h2>
-<pre id="DanhSachGiaoDichDaSua"></pre>
+<h2>Danh sách các giao dịch sau khi đào tiền ảo lần 2 trong Blockchain:</h2>
+<pre id="DanhSachExchangeSauKhiDaoLan2"></pre>
 <br />
-<h2>Kiểm tra tính toàn vẹn của Blockchain sau khi đã bị sửa:</h2>
-<p id="SauKhiSua"></p>
+<h2>Kiểm tra lần đào 2 myWallet :
+  <pre id="DiaChiViTienCuaToiLan2"></pre>
+</h2>
 <br />
+<h2>Danh sách các giao dịch sau khi đào tiền ảo lần 3 trong Blockchain:</h2>
+<pre id="DanhSachExchangeSauKhiDaoLan3"></pre>
+<br />
+<h2>Kiểm tra tính toàn vẹn của Blockchain sau 2 lần giao dịch:</h2>
+<p id="KiemTra"></p>
+<br />
+<h2>Kiểm tra lần đào 3 myWallet :
+  <pre id="DiaChiViTienCuaToiLan3"></pre>
+</h2>
 
 <script>
   /*=== BẮT ĐẦU TEST CÁC CHỨC NĂNG CỦA BLOCKCHAIN VỪA TẠO  ===*/
-
   var MyCoin = new Blockchain(); //Tạo mới một Blockchain để chứa các giao dịch.
-  MyCoin.createBlock(new Block("02/01/2018", { //Thêm một giao dịch mới, Data là một Object chứa nội dung chuyển tiền
-    NguoiGui: "Ong A",
-    NguoiNhan: "Ba B",
-    Tien: 350
-  }));
 
-  MyCoin.createBlock(new Block("03/01/2018", { //Thêm một giao dịch mới, Data là một Object chứa nội dung chuyển tiền
-    NguoiGui: "Ba B",
-    NguoiNhan: "Ong C",
-    Tien: 200
-  }));
+  const myWallet = Math.floor(Math.random() * 9999) + 1000
 
-  //Đầu tiên ta hiển thị thử xem mảng Blockchain chứa giao dịch đang có những gì
-  document.getElementById("DanhSachGiaoDich").innerHTML = JSON.stringify(MyCoin, null, 2);
+  console.log('wallet = ', myWallet)
 
-  //Ta kiểm tra tính toàn vẹn của Mảng Blockchain hiện tại.
-  document.getElementById("TruocKhiSua").innerHTML = MyCoin.validating(); //return  true;
+  MyCoin.createTransaction(new Exchange(
+    "Dia Chi Vi Tien Ong A",
+    "Dia Chi Vi Tien Ba B",
+    350
+  ));
 
-  //Giả sử Hacker lấy được toàn bộ mảng Blockchain hiện tại của ta, và hắn tìm cách sửa đổi một phần tử trong mảng.
-  MyCoin.blockArr[2].data = {
-    NguoiGui: "Ba B",
-    NguoiNhan: "Ong C",
-    Tien: 400
-  };
+  MyCoin.createTransaction(new Exchange(
+    "Dia Chi Vi Tien Ba B",
+    "Dia Chi Vi Tien Ong C",
+    200
+  ));
 
-  //Lúc này mảng đã bị ảnh hưởng, hãy kiểm tra tính toàn vẹn của mảng một lần nữa.
-  document.getElementById("DanhSachGiaoDichDaSua").innerHTML = JSON.stringify(MyCoin, null, 2);
-  document.getElementById("SauKhiSua").innerHTML = MyCoin.validating(); //return false;
+  MyCoin.createTransaction(new Exchange(
+    "Dia Chi Vi Tien Ba C",
+    "Dia Chi Vi Tien Ong D",
+    200
+  ));
 
+  MyCoin.createTransaction(new Exchange(
+    "Dia Chi Vi Tien Ba D",
+    "Dia Chi Vi Tien Ong E",
+    200
+  ));
+
+  console.log("Bắt đầu đào tiền ảo...");
+
+  //Hiển thị toàn bộ Blockchain sau khi đã chạy xong thuật toán đào tiền và nhét các Block vào Blockchain.
+  document.getElementById("DanhSachExchangeSauKhiDaoLan1").innerHTML = JSON.stringify(MyCoin, null, 2);
+
+  //Lúc này ta sẽ dùng máy tính này để chạy thuật toán đào tiền ảo, truyền vào địa chỉ ví tiền để nhận tiền ảo. 
+  MyCoin.mineCoin(myWallet);
+
+  //Hãy kiểm tra lượng tiền ảo ta có trong ví.
+  document.getElementById("DiaChiViTienCuaToiLan1").innerHTML = MyCoin.checkBalance(myWallet);
+
+
+  //Ta thấy sau lần đào tiền đầu tiên thì ví tiền của ta vẫn trống rỗng. Hãy đào tiếp một lần nữa để có thể lấy đc phần thưởng của lần trước đó.
+  MyCoin.mineCoin(myWallet);
+
+  //Kiểm tra lại lượng tiền ảo ta có trong ví. Ta thấy nó đã có giá trị
+  document.getElementById("DiaChiViTienCuaToiLan2").innerHTML = MyCoin.checkBalance(myWallet);
+
+  //Hiển thị toàn bộ Blockchain sau khi đã chạy xong thuật toán đào tiền và nhét các Block vào Blockchain lần 2
+  document.getElementById("DanhSachExchangeSauKhiDaoLan2").innerHTML = JSON.stringify(MyCoin, null, 2);
+
+  MyCoin.mineCoin(myWallet);
+
+  //Hiển thị toàn bộ Blockchain sau khi đã chạy xong thuật toán đào tiền và nhét các Block vào Blockchain lần 2
+  document.getElementById("DanhSachExchangeSauKhiDaoLan3").innerHTML = JSON.stringify(MyCoin, null, 2);
+  //Kiểm tra lại lượng tiền ảo ta có trong ví. Ta thấy nó đã có giá trị
+  document.getElementById("DiaChiViTienCuaToiLan3").innerHTML = MyCoin.checkBalance(myWallet);
+  //Kiểm tra lại xem sau 2 lần giao dịch thì các giao dịch trong Blockchain có còn minh bạch và toàn vẹn hay không
+  document.getElementById("KiemTra").innerHTML = MyCoin.validating();
 </script>
